@@ -44,4 +44,4 @@ mat = coo_matrix((
     (user_index, attraction_index)      # adjacency list
 ))
 useritemdf = mat.toarray()
-itemuserdf = df.transpose()
+itemuserdf = useritemdf.transpose()
