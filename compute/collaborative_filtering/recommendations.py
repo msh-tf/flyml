@@ -1,24 +1,11 @@
-from datasets import generate_user_index_mapping
-from datasets import generate_attraction_index_mapping
-
-
-def get_dim_id_for_serial(**kwargs):
-    try:
-        try:
-            serial=kwargs['serial']
-            dim_id_type=kwargs['dim_id_type']
-        except (KeyError, UnboundLocalError) as err:
-            print(err)
-
-        if dim_id_type=='user':
-            row = user_index_mapping.query('serial=='+str(serial)).head(1)
-            dim_id = row['user_dim_id'][row.index[0]]
-        elif dim_id_type=='attraction':
-            row = attraction_index_mapping.query('serial=='+str(serial)).head(1)
-            dim_id = row['attraction_id'][row.index[0]]
-    except Exception as error:
-        print(error)
-    return dim_id
+from datasets import useritemdf
+from datasets import itemuserdf
+from recommend.models import SimilarUsers
+from recommend.models import SimilarAttractions
+from itertools import chain
+import pandas as pd
+from util import get_id_for_serial
+from util import get_serial_for_id
 
 
 # extract recommendations and store in db
@@ -31,16 +18,19 @@ def get_attraction_recommendations_by_user(**kwargs):
         print('Enter ', ke)
 
     # get userids purchase history
-    users_attraction_history = useritemdf[user].nonzero()[0]
+    user_serial = get_serial_for_id(id=user, serial_type='user')
+    attr_serials = useritemdf[user_serial].nonzero()[0]
+    users_attraction_history = \
+        [get_id_for_serial(serial=s, id_type='attraction') for s in attr_serials]
     candidates = []
 
     # go through purchase history and populate candidate list
     for i in users_attraction_history:
-        result = SimilarAttractions.objects.filter(attraction_id=i)
+        result = SimilarAttractions.objects.filter(attraction_id=i).values()
         candidates = list(chain(candidates, result))
-
+    print(candidates)
     if candidates!=[]:
-        deduped_recos = pandas.DataFrame(candidates).drop_duplicates(
+        deduped_recos = pd.DataFrame(candidates).drop_duplicates(
             subset=['attraction_id'])
         res = deduped_recos.sort_values('similarity', ascending=False)[:n]
         res = res.to_dict(orient='records')
@@ -59,16 +49,19 @@ def get_user_recommendations_by_attraction(**kwargs):
         print('Enter ', ke)
 
     # get userids purchase history
-    attractions_user_history = itemuserdf[attraction].nonzero()[0]
+    attr_serial = get_serial_for_id(id=attraction, serial_type='attraction')
+    user_serials = itemuserdf[attr_serial].nonzero()[0]
+    attractions_user_history = \
+        [get_id_for_serial(serial=s, id_type='user') for s in user_serials]
     candidates = []
 
     # go through purchase history and populate candidate list
     for i in attractions_user_history:
-        result = SimilarUsers.objects.filter(user_dim_id=i)
+        result = SimilarUsers.objects.filter(user_dim_id=i).values()
         candidates = list(chain(candidates, result))
 
     if candidates!=[]:
-        deduped_recos = pandas.DataFrame(candidates).drop_duplicates(
+        deduped_recos = pd.DataFrame(candidates).drop_duplicates(
             subset=['user_dim_id'])
         res = deduped_recos.sort_values('similarity', ascending=False)[:n]
         res = res.to_dict(orient='records')
