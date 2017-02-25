@@ -11,7 +11,7 @@ from util import get_serial_for_id
 # extract recommendations and store in db
 def get_attraction_recommendations_by_user(**kwargs):
     try:
-        user = kwargs['user']
+        user=kwargs['user']
         n=kwargs['n']
     except KeyError as ke:
         print('Key error: ',ke)
@@ -31,7 +31,7 @@ def get_attraction_recommendations_by_user(**kwargs):
     print(candidates)
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
-            subset=['attraction_id'])
+            subset=['similar_attraction_id'])
         res = deduped_recos.sort_values('similarity', ascending=False)[:n]
         res = res.to_dict(orient='records')
     else:
@@ -44,6 +44,7 @@ def get_attraction_recommendations_by_user(**kwargs):
 def get_user_recommendations_by_attraction(**kwargs):
     try:
         attraction = kwargs['attraction']
+        n=kwargs['n']
     except KeyError as ke:
         print('Key error: ',ke)
         print('Enter ', ke)
@@ -62,7 +63,7 @@ def get_user_recommendations_by_attraction(**kwargs):
 
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
-            subset=['user_dim_id'])
+            subset=['similar_user_dim_id'])
         res = deduped_recos.sort_values('similarity', ascending=False)[:n]
         res = res.to_dict(orient='records')
     else:
