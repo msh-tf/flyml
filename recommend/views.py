@@ -27,7 +27,6 @@ def get_user_info(request, userid):
     simusers = list(
         SimilarUsers.objects.filter(user_dim_id=userid).values()[:10])
     recattrs = get_attraction_recommendations_by_user(user=int(userid), n=20)
-    print(recattrs)
     return JsonResponse(
         make_user_info_json_response(userid, simusers, recattrs),
         safe=False

@@ -28,7 +28,7 @@ def get_attraction_recommendations_by_user(**kwargs):
     for i in users_attraction_history:
         result = SimilarAttractions.objects.filter(attraction_id=i).values()
         candidates = list(chain(candidates, result))
-    print(candidates)
+
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
             subset=['similar_attraction_id'])
