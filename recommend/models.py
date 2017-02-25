@@ -25,12 +25,12 @@ class SimilarAttractions(models.Model):
     similarity = models.FloatField()
     ts = models.DateTimeField()
 
-
-class UserAttractionHistory(models.Model):
-    user_dim_id = models.IntegerField()
-    attraction_id = models.IntegerField()
-
-
-class AttractionUserHistory(models.Model):
-    attraction_id = models.IntegerField()
-    user_dim_id = models.IntegerField()
+#
+# class UserAttractionHistory(models.Model):
+#     user_dim_id = models.IntegerField()
+#     attraction_id = models.IntegerField()
+#
+#
+# class AttractionUserHistory(models.Model):
+#     attraction_id = models.IntegerField()
+#     user_dim_id = models.IntegerField()
