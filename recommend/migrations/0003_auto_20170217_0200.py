@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='eventrecommendations',
             old_name='serial_user',
-            new_name='user_dim_id',
+            new_name='user_id',
         ),
         migrations.RenameField(
             model_name='similarevents',
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='userrecommendations',
             old_name='series_event',
-            new_name='user_dim_id',
+            new_name='user_id',
         ),
         migrations.RemoveField(
             model_name='event',
