@@ -21,7 +21,8 @@ def get_attraction_recommendations_by_user(**kwargs):
     user_app_id = User.objects.filter(user_id=user).values('app_id')[0]['app_id']
     attr_app_ids = useritemdf[user_app_id].nonzero()[0]
     users_attraction_history = \
-        [Attraction.objects.filter(app_id=a).value('attraction_id')[0]['attraction_id'] for a in attr_app_ids]
+        [Attraction.objects.filter(app_id=a).values('attraction_id')[0]['attraction_id']
+        for a in attr_app_ids]
     candidates = []
 
     # go through purchase history and populate candidate list
@@ -50,7 +51,7 @@ def get_user_recommendations_by_attraction(**kwargs):
         print('Enter ', ke)
 
     # get userids purchase history
-    attr_app_id = Attraction.objects.filter(attraction_id=attraction).value('app_id')[0]['app_id']
+    attr_app_id = Attraction.objects.filter(attraction_id=attraction).values('app_id')[0]['app_id']
     user_app_ids = itemuserdf[attr_app_id].nonzero()[0]
     attractions_user_history = \
         [User.objects.filter(app_id=u).values('user_id')[0]['user_id'] for u in user_app_ids]
