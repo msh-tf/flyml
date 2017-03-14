@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.db.models import DateTimeField
 
 from datasets import writeable_users
 from datasets import writeable_attractions
