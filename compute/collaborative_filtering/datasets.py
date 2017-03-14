@@ -33,7 +33,9 @@ attraction_index = le.transform(user_artists['attraction_attraction_id'])
 attraction_index_mapping = pandas.DataFrame({
     'app_id': attraction_index,
     'attraction_id': user_artists['attraction_attraction_id'],
-    'attraction_name': user_artists['attraction_attraction_name']
+    'attraction_name': user_artists['attraction_attraction_name'],
+    'attraction_event_name': user_artists['event_event_name'],
+    'attraction_start_datetime': user_artists['event_start_datetime']
 })
 attraction_index_mapping.set_index('app_id')
 writeable_attractions = attraction_index_mapping.drop_duplicates(
