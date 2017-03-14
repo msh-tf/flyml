@@ -6,12 +6,14 @@ from compute.collaborative_filtering import \
     get_user_recommendations_by_attraction
 from models import SimilarUsers
 from models import SimilarAttractions
+from django.core import serializers
+from django.shortcuts import render
+import json
 
 
 def index(request):
-    return HttpResponse(
-        "Hello, world. This is the ticketfly machine learning server"
-    )
+    context = {'data': "Hello, world. This is the ticketfly machine learning server"}
+    return render(request, 'recommend/index.html', context)
 
 
 def make_user_info_json_response(userid, simusers, recattrs):
@@ -25,12 +27,14 @@ def make_user_info_json_response(userid, simusers, recattrs):
 
 def get_user_info(request, userid):
     simusers = list(
-        SimilarUsers.objects.filter(user_dim_id=userid).values()[:10])
-    recattrs = get_attraction_recommendations_by_user(user=int(userid), n=20)
-    return JsonResponse(
-        make_user_info_json_response(userid, simusers, recattrs),
-        safe=False
-    )
+        SimilarUsers.objects.filter(user_id=userid).values()[:10])
+    recattrs = get_attraction_recommendations_by_user(user=int(userid), n=10)
+    context = {
+        'data': json.dumps(
+            make_user_info_json_response(userid, simusers, recattrs),
+            indent=4)
+    }
+    return render(request, 'recommend/user_info.html', context)
 
 
 def make_attraction_info_json_response(attrid, simattrs, recusers):
