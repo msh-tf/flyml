@@ -33,12 +33,12 @@ def get_attraction_recommendations_by_user(**kwargs):
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
             subset=['similar_attraction_id'])
-        res = deduped_recos.sort_values('similarity', ascending=False)[:n]
-        res = res.to_dict(orient='records')
+        recs = deduped_recos.sort_values('similarity', ascending=False)[:n]
+        recs = recs.to_dict(orient='records')
     else:
         res = []
 
-    return res
+    return users_attraction_history, recs
 
 
 # function to take itemid adn return recommended users

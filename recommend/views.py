@@ -4,10 +4,11 @@ from compute.collaborative_filtering import \
     get_attraction_recommendations_by_user
 from compute.collaborative_filtering import \
     get_user_recommendations_by_attraction
-from models import SimilarUsers
-from models import SimilarAttractions
+from models import User, SimilarUsers
+from models import Attraction, SimilarAttractions
 from django.core import serializers
 from django.shortcuts import render
+from itertools import chain
 import json
 
 
@@ -16,25 +17,31 @@ def index(request):
     return render(request, 'recommend/index.html', context)
 
 
-def make_user_info_json_response(userid, simusers, recattrs):
-    res = {
-        'user': userid,
-        'similar_users': simusers,
-        'recommended_attractions': recattrs
-    }
-    return res
-
-
 def get_user_info(request, userid):
-    simusers = list(
-        SimilarUsers.objects.filter(user_id=userid).values()[:10])
-    recattrs = get_attraction_recommendations_by_user(user=int(userid), n=10)
+    simuids = [s['similar_user_id'] for s in list(
+        SimilarUsers.objects.filter(user_id=userid).values('similar_user_id'))]
+    simusers = [list(User.objects.filter(user_id=s).values(
+        'first', 'last', 'email')) for s in simuids]
+
+    history, recs = get_attraction_recommendations_by_user(
+        user=int(userid), n=10
+    )
+    recattrs = [a['similar_attraction_id'] for a in recs]
+    recattnames = [list(Attraction.objects.filter(
+            attraction_id=s).values('attraction_name')) for s in recattrs]
+
+    seen_attrs = [list(Attraction.objects.filter(
+            attraction_id=s).values('attraction_name')) for s in history]
+            
     context = {
-        'data': json.dumps(
-            make_user_info_json_response(userid, simusers, recattrs),
-            indent=4)
+        'data': {
+            'user': userid,
+            'similar_users': simusers,
+            'recommended_attractions': recattnames,
+            'seen_attractions': seen_attrs
+        }
     }
-    return render(request, 'recommend/user_info.html', context)
+    return render(request, 'recommend/user_info_tabular.html', context)
 
 
 def make_attraction_info_json_response(attrid, simattrs, recusers):
