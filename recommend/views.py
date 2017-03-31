@@ -20,19 +20,27 @@ def index(request):
 def get_user_info(request, userid):
     simuids = [s['similar_user_id'] for s in list(
         SimilarUsers.objects.filter(user_id=userid).values('similar_user_id'))]
-    simusers = [list(User.objects.filter(user_id=s).values(
+    simusersdictlist = [list(User.objects.filter(user_id=s).values(
         'first', 'last', 'email')) for s in simuids]
+    simusers=[]
+    for u in simusersdictlist:
+        f = u[0]['first']
+        l = u[0]['last']
+        e = u[0]['email']
+        simusers.append(f+" "+l+" ("+e+")")
 
     history, recs = get_attraction_recommendations_by_user(
         user=int(userid), n=10
     )
     recattrs = [a['similar_attraction_id'] for a in recs]
-    recattnames = [list(Attraction.objects.filter(
+    recattdictlist = [list(Attraction.objects.filter(
             attraction_id=s).values('attraction_name')) for s in recattrs]
+    recattnames = [str(s[0]['attraction_name']) for s in recattdictlist]
 
-    seen_attrs = [list(Attraction.objects.filter(
+    seenattrdictlist = [list(Attraction.objects.filter(
             attraction_id=s).values('attraction_name')) for s in history]
-            
+    seen_attrs = [str(s[0]['attraction_name']) for s in seenattrdictlist]
+
     context = {
         'data': {
             'user': userid,
