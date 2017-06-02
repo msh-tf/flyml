@@ -49,7 +49,7 @@ def get_user_info(request, userid):
             'seen_attractions': seen_attrs
         }
     }
-    return render(request, 'recommend/user_info_tabular.html', context)
+    return render(request, 'recommend/user_info_lists.html', context)
 
 
 def make_attraction_info_json_response(attrid, simattrs, recusers):
