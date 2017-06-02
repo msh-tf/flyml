@@ -5,7 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 
 
 user_artists = pandas.read_csv(
-    '/Users/manas.hardas/projects/event_recommender/user_artist_dataset.csv'
+    '/Users/manas.hardas/projects/event_recommender/user_artist_dataset_2016.csv'
 )
 
 # Generate an index for userids and attractionids (items)
@@ -13,27 +13,31 @@ user_artists = pandas.read_csv(
 # and attractionids to an index starting from 0 and incremented by.
 
 le = LabelEncoder()
-le.fit(user_artists['user_dim_id'])
-user_index = le.transform(user_artists['user_dim_id'])
+le.fit(user_artists['user_user_id'])
+user_index = le.transform(user_artists['user_user_id'])
 
 user_index_mapping = pandas.DataFrame({
-    'user_dim_id': user_artists['user_dim_id'],
+    'user_id': user_artists['user_user_id'],
     'user_email_address': user_artists['user_email_address'],
-    'serial': user_index
+    'user_first_name': user_artists['user_first_name'],
+    'user_last_name': user_artists['user_last_name'],
+    'app_id': user_index
 })
-user_index_mapping.set_index('serial')
-writeable_users = user_index_mapping.drop_duplicates(subset=['user_dim_id'])
+user_index_mapping.set_index('app_id')
+writeable_users = user_index_mapping.drop_duplicates(subset=['user_id'])
 
 le = LabelEncoder()
 le.fit(user_artists['attraction_attraction_id'])
 attraction_index = le.transform(user_artists['attraction_attraction_id'])
 
 attraction_index_mapping = pandas.DataFrame({
-    'serial': attraction_index,
+    'app_id': attraction_index,
     'attraction_id': user_artists['attraction_attraction_id'],
-    'attraction_name': user_artists['attraction_attraction_name']
+    'attraction_name': user_artists['attraction_attraction_name'],
+    'attraction_event_name': user_artists['event_event_name'],
+    'attraction_start_datetime': user_artists['event_start_datetime']
 })
-attraction_index_mapping.set_index('serial')
+attraction_index_mapping.set_index('app_id')
 writeable_attractions = attraction_index_mapping.drop_duplicates(
     subset=['attraction_id'])
 

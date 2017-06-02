@@ -1,0 +1,24 @@
+Seen attractions:
+<ul>
+{% for a in data.seen_attractions %}
+    <li>{{ a }}</li>
+{% endfor %}
+</ul>
+
+</br>
+
+Recommended attractions:
+<ul>
+{% for a in data.recommended_attractions %}
+    <li>{{ a }}</li>
+{% endfor %}
+</ul>
+
+</br>
+
+Similar users:
+<ul>
+{% for a in data.similar_users %}
+    <li>{{ a }}</li>
+{% endfor %}
+</ul>

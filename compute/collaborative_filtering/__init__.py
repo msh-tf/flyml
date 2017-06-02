@@ -5,5 +5,3 @@ from persist import persist_attractions_data_to_db
 from persist import persist_user_similarities_to_db
 from persist import persist_attraction_similarities_to_db
 from datasets import *
-from util import get_id_for_serial
-from util import get_serial_for_id

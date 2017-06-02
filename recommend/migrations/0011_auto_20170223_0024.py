@@ -25,11 +25,11 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name='similarusers',
             old_name='similar',
-            new_name='similar_user_dim_id',
+            new_name='similar_user_id',
         ),
         migrations.RenameField(
             model_name='similarusers',
             old_name='user',
-            new_name='user_dim_id',
+            new_name='user_id',
         ),
     ]

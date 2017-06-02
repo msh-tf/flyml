@@ -1,11 +1,11 @@
 from datasets import useritemdf
 from datasets import itemuserdf
+from recommend.models import User
+from recommend.models import Attraction
 from recommend.models import SimilarUsers
 from recommend.models import SimilarAttractions
 from itertools import chain
 import pandas as pd
-from util import get_id_for_serial
-from util import get_serial_for_id
 
 
 # extract recommendations and store in db
@@ -18,10 +18,11 @@ def get_attraction_recommendations_by_user(**kwargs):
         print('Enter ', ke)
 
     # get userids purchase history
-    user_serial = get_serial_for_id(id=user, serial_type='user')
-    attr_serials = useritemdf[user_serial].nonzero()[0]
+    user_app_id = User.objects.filter(user_id=user).values('app_id')[0]['app_id']
+    attr_app_ids = useritemdf[user_app_id].nonzero()[0]
     users_attraction_history = \
-        [get_id_for_serial(serial=s, id_type='attraction') for s in attr_serials]
+        [Attraction.objects.filter(app_id=a).values('attraction_id')[0]['attraction_id']
+        for a in attr_app_ids]
     candidates = []
 
     # go through purchase history and populate candidate list
@@ -32,12 +33,12 @@ def get_attraction_recommendations_by_user(**kwargs):
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
             subset=['similar_attraction_id'])
-        res = deduped_recos.sort_values('similarity', ascending=False)[:n]
-        res = res.to_dict(orient='records')
+        recs = deduped_recos.sort_values('similarity', ascending=False)[:n]
+        recs = recs.to_dict(orient='records')
     else:
         res = []
 
-    return res
+    return users_attraction_history, recs
 
 
 # function to take itemid adn return recommended users
@@ -50,20 +51,20 @@ def get_user_recommendations_by_attraction(**kwargs):
         print('Enter ', ke)
 
     # get userids purchase history
-    attr_serial = get_serial_for_id(id=attraction, serial_type='attraction')
-    user_serials = itemuserdf[attr_serial].nonzero()[0]
+    attr_app_id = Attraction.objects.filter(attraction_id=attraction).values('app_id')[0]['app_id']
+    user_app_ids = itemuserdf[attr_app_id].nonzero()[0]
     attractions_user_history = \
-        [get_id_for_serial(serial=s, id_type='user') for s in user_serials]
+        [User.objects.filter(app_id=u).values('user_id')[0]['user_id'] for u in user_app_ids]
     candidates = []
 
     # go through purchase history and populate candidate list
     for i in attractions_user_history:
-        result = SimilarUsers.objects.filter(user_dim_id=i).values()
+        result = SimilarUsers.objects.filter(user_id=i).values()
         candidates = list(chain(candidates, result))
 
     if candidates!=[]:
         deduped_recos = pd.DataFrame(candidates).drop_duplicates(
-            subset=['similar_user_dim_id'])
+            subset=['similar_user_id'])
         res = deduped_recos.sort_values('similarity', ascending=False)[:n]
         res = res.to_dict(orient='records')
     else:
